@@ -1,0 +1,25 @@
+{
+    "name": "evaldobarbosa/tokenbasedauth",
+    "description": "Biblioteca de autenticação por tokens",
+    "version": "0.1.0",
+    "type": "library",
+    "homepage": "http://www.evaldobarbosa.com.br/projetos/tokenbasedauth",
+    "license": "LGPL-3.0",
+    "require-dev": {
+        "phpunit/phpunit": "4.7.*"
+    },
+    "authors": [
+        {
+            "name": "Evaldo Barbosa",
+            "email": "evaldobarbosa@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "TBA": "src\/"
+        }
+    },
+    "config": {
+        "bin-dir": "bin"
+    }
+}
