@@ -1,5 +1,5 @@
 {
-    "name": "evaldobarbosa/tokenbasedauth",
+    "name": "evaldobarbosa/TokenBasedAuth",
     "description": "Biblioteca de autenticação por tokens",
     "version": "0.1.0",
     "type": "library",
