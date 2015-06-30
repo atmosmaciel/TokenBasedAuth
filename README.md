@@ -3,6 +3,17 @@ Biblioteca para autenticação baseada em tokens
 
 ##Como usar
 
+####Adicione o repositório ao composer.json
+`
+"repositories": [
+		{
+            "type": "vcs",
+            "url": "https://github.com/evaldobarbosa/TokenBasedAuth.git"
+        }
+	]
+`
+
+####Utilize o bloco de código a seguir
 `php
 $auth = new \TBA\TokenBasedAuth($this->config);
 
