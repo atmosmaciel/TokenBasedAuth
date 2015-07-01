@@ -35,3 +35,6 @@ $auth->check( TOKEN_STR );
 
 ###Veja um exemplo
 Abra o diretório src/Boilerplate/src/Routable. O exemplo é baseado no microframework respect/rest.
+
+###Artigos
+http://www.evaldobarbosa.com.br
