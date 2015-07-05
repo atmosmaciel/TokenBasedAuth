@@ -4,17 +4,21 @@ Biblioteca para autenticação baseada em tokens
 ##Como usar
 
 ####Adicione o repositório ao composer.json
-`
+
+```json
 "repositories": [
-		{
+	{
             "type": "vcs",
             "url": "https://github.com/evaldobarbosa/TokenBasedAuth.git"
         }
-	]
-`
+],
+"require": {
+	"evaldobarbosa/tokenbasedauth": "dev-master"
+}
+```
 
 ####Utilize o bloco de código a seguir
-`php
+```php
 $auth = new \TBA\TokenBasedAuth($this->config);
 
 $conn = new \PDO(
@@ -27,7 +31,10 @@ $conn = new \PDO(
 $auth->setConnection( $conn );
 
 $auth->check( TOKEN_STR );
-`php
+```
 
 ###Veja um exemplo
 Abra o diretório src/Boilerplate/src/Routable. O exemplo é baseado no microframework respect/rest.
+
+###Artigos
+http://www.evaldobarbosa.com.br
