@@ -9,5 +9,6 @@ script:
 
 php:
   - 5.5
+  - hhvm
   - nightly
   - '7'
