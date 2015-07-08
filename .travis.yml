@@ -1,9 +1,6 @@
 language:
   php
 
-before_script:
-  "cd tests"
-
 script:
   "phpunit --testdox"
 
