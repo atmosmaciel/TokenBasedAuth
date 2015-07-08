@@ -2,7 +2,7 @@ language:
   php
 
 script:
-  "phpunit --testdox"
+  "bin/phpunit -c tests/phpunit.xml --testdox"
 
 php:
   - 5.5
