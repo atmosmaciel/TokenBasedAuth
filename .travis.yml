@@ -1,8 +1,11 @@
 language:
   php
 
+before_script:
+  "cd tests"
+
 script:
-  "phpunit -c tests/phpunit.xml --testdox"
+  "phpunit --configuration phpunit.xml --testdox"
 
 php:
   - 5.5
