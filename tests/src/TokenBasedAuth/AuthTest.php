@@ -1,6 +1,10 @@
 <?php
 namespace TBA;
 
+use \PHPUnit_Extensions_Database_Operation_Composite,
+	\PHPUnit_Extensions_Database_Operation_Factory;
+use PDO;
+
 /**
  * @group Lib
  */
@@ -9,22 +13,23 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
 	private $conn;
 	private $config;
 
+    static private $pdo = null;
+
 	function setup() {
 		$this->config = [
-			"table_name" => "pessoa",
-			"user_field" => "usuario",
-			"pass_field" => "senha",
+			"table_name" => "user",
+			"user_field" => "username",
+			"pass_field" => "password",
 			"salt"		 => "ABCDEFGH1092",
 			"token_timeout" => 10
 		];
 		$this->auth = new \TBA\TokenBasedAuth($this->config);
 
-		$this->conn = new \PDO(
-			"mysql:dbname=yourdbname;host=127.0.0.1;port=3306",
-			DBUSER,
-			DBPASS,
-			[ \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8' ]
-		);
+		$pdo = new PDO('sqlite::memory:');
+		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		$pdo->exec( file_get_contents( __DIR__ . '/table.sql' ) );
+
+		$this->conn = $pdo;
 
 		$this->auth->setConnection( $this->conn );
 	}
@@ -34,9 +39,27 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
 			throw new \Exception("Forneça um array com os nomes dos métodos", 1);
 		}
 
-		return $this->getMockBuilder('TBA\TokenBasedAuth')
+		$h = $this->getMockBuilder('TBA\Header')
+			->setMethods(['getClientToken','getAppToken'])
+			->getMock();
+		$h->expects($this->any())
+			->method('getClientToken')
+			->willReturn('9I3JJSYEH');
+		$h->expects($this->any())
+			->method('getAppToken')
+			->willReturn('ABC12DE45X');
+
+		$methods[] = 'getHeader';
+
+		$auth = $this->getMockBuilder('TBA\TokenBasedAuth')
 				->setConstructorArgs([$this->config])
 				->setMethods( $methods )->getMock();
+
+		$auth->expects($this->any())
+			->method('getHeader')
+			->willReturn($h);
+
+		return $auth;
 	}
 
 	function testTipoCorretoObjeto() {
@@ -130,8 +153,8 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
 	function testChecarTokenNaoExistente() {
 		$user = (object)[
 			'id' => 1,
-			'nome' => 'Evaldo Barbosa',
-			'usuario' => 'evaldo',
+			'name' => 'Evaldo Barbosa',
+			'username' => 'evaldo',
 			'token' => 'AAAAAAA',
 			'tokenval' => '2010-01-01 10:10:10'
 		];
@@ -149,8 +172,8 @@ class AuthTest extends \PHPUnit_Framework_TestCase {
 		$dt = ( new \Datetime );
 		$user = (object)[
 			'id' => 1,
-			'nome' => 'Evaldo Barbosa',
-			'usuario' => 'evaldo',
+			'name' => 'Evaldo Barbosa',
+			'username' => 'evaldo',
 			'token' => 'AAAAAAA',
 			'tokenval' => $dt->format("Y-m-d H:i:s")
 		];

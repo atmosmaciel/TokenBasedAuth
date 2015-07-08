@@ -28,11 +28,13 @@ class TokenBasedAuth {
 	}
 
 	function getUserByToken() {
-		$qry = $this->conn->prepare(
-			'SELECT id, nome, login, token, tokenval FROM pessoa WHERE token = :token'
-		);
-
-		$qry->bindParam('token',$token);
+		$sql = sprintf(
+				'SELECT id, %s, token, tokenval FROM %s WHERE token = :token',
+				filter_var( $this->config['user_field'], FILTER_SANITIZE_STRING ),
+				filter_var( $this->config['table_name'], FILTER_SANITIZE_STRING )
+			);
+		$qry = $this->conn->prepare( $sql );
+		$qry->bindParam('token',$this->getHeader()->getClientToken());
 		$qry->execute();
 
 		$this->user = $qry->fetchObject();
@@ -44,22 +46,23 @@ class TokenBasedAuth {
 
 	function login($user,$password) {
 		$sql = sprintf(
-				'SELECT * FROM %s WHERE %s = :user AND %s = :pass;',
+				'SELECT * FROM %s WHERE %s = :my_user AND %s = :my_pass;',
 				filter_var( $this->config['table_name'], FILTER_SANITIZE_STRING ),
 				filter_var( $this->config['user_field'], FILTER_SANITIZE_STRING ),
 				filter_var( $this->config['pass_field'], FILTER_SANITIZE_STRING )
 			);
 		$qry = $this->conn->prepare( $sql );
 
-		$qry->bindParam('user',$user);
-		$qry->bindParam('pass',$password);
+		$qry->bindParam('my_user',$user);
+		$qry->bindParam('my_pass',$password);
 		$qry->execute();
+
+		$this->user = $qry->fetchObject();
 		
-		if ( $qry->rowCount() == 0 ) {
+		if ( !isset($this->user->id) || (int)$this->user->id == 0 ) {
 			throw new \TBA\Exceptions\InvalidLoginException("Combinação de login e senha inválida");
 		}
 			
-		$this->user = $qry->fetchObject();
 		unset( $this->user->{$this->config["pass_field"]} );
 
 		$this->changeToken();
@@ -78,9 +81,11 @@ class TokenBasedAuth {
 		);
 		$this->getUser()->tokenval = new \Datetime($time);
 
-		$qry = $this->conn->prepare(
-			'UPDATE pessoa SET token = :token, tokenval = :tokenval WHERE id = :id'
-		);
+		$sql = sprintf(
+				'UPDATE %s SET token = :token, tokenval = :tokenval WHERE id = :id',
+				filter_var( $this->config['table_name'], FILTER_SANITIZE_STRING )
+			);
+		$qry = $this->conn->prepare( $sql );
 
 		$val = $this->getUser()->tokenval->format("Y-m-d H:i:s");
 		$qry->bindParam('token',$this->getUser()->token);
@@ -90,9 +95,12 @@ class TokenBasedAuth {
 	}
 
 	function getToken($token) {
-		$qry = $this->conn->prepare(
-			'SELECT token, tokenval FROM pessoa WHERE token = :token'
+		$sql = sprintf(
+			'SELECT token, tokenval FROM %s WHERE token = :token',
+			filter_var( $this->config['table_name'], FILTER_SANITIZE_STRING )
 		);
+
+		$qry = $this->conn->prepare( $sql );
 
 		$qry->bindParam('token',$token);
 		$qry->execute();

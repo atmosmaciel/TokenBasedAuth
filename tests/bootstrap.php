@@ -1,10 +1,6 @@
 <?php
 $path = realpath( dirname(__FILE__) );
 
-define("DBNAME","mysql://user:123user@localhost:3306/yourdbname");
-define("DBUSER","user");
-define("DBPASS","123user");
-
 define("APP_TOKEN","ABC12DE45X");
 
 /** Part of Respect/Rest library */
