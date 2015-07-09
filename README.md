@@ -1,3 +1,5 @@
+https://travis-ci.org/evaldobarbosa/TokenBasedAuth.svg?branch=master
+
 # TokenBasedAuth
 Biblioteca para autenticação baseada em tokens
 
