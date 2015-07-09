@@ -1,4 +1,4 @@
-[Travis](https://travis-ci.org/evaldobarbosa/TokenBasedAuth.svg?branch=master)
+![Travis](https://travis-ci.org/evaldobarbosa/TokenBasedAuth.svg?branch=master)
 
 # TokenBasedAuth
 Biblioteca para autenticação baseada em tokens
