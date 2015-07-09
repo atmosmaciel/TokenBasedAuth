@@ -15,19 +15,16 @@ class TokenBasedAuth {
 	private $header;
 
 	private $config;
-	private $authEvents = [];
 
-	static function setConfig($config) {
-		self::$staticConfig = $config;
-	}
-
-	function __construct($config=null) {
+	function __construct($config=null)
+	{
 		$this->config = ( is_null($config) )
 			? self::$staticConfig
 			: $config;
 	}
 
-	function getUserByToken() {
+	function getUserByToken()
+	{
 		$token = $this->getHeader()->getClientToken();
 		
 		$sql = sprintf(
@@ -42,11 +39,13 @@ class TokenBasedAuth {
 		$this->user = $qry->fetchObject();
 	}
 
-	function getNewToken($value=null) {
+	function getNewToken($value=null)
+	{
 		return $this->getGenerator()->generate($value);
 	}
 
-	function login($user,$password) {
+	function login($user,$password)
+	{
 		$sql = sprintf(
 				'SELECT * FROM %s WHERE %s = :my_user AND %s = :my_pass;',
 				filter_var( $this->config['table_name'], FILTER_SANITIZE_STRING ),
@@ -70,7 +69,8 @@ class TokenBasedAuth {
 		$this->changeToken();
 	}
 
-	function changeToken() {
+	function changeToken()
+	{
 		if ( is_null($this->user) ) {
 			$this->getUserByToken();
 		}
@@ -96,7 +96,8 @@ class TokenBasedAuth {
 		$qry->execute();
 	}
 
-	function getToken($token) {
+	function getToken($token)
+	{
 		$sql = sprintf(
 			'SELECT token, tokenval FROM %s WHERE token = :token',
 			filter_var( $this->config['table_name'], FILTER_SANITIZE_STRING )
@@ -110,7 +111,8 @@ class TokenBasedAuth {
 		return $qry->fetchObject();
 	}
 
-	function check($token) {
+	function check($token)
+	{
 		$tokenFromDb = $this->getToken($token);
 
 		if ( isset($tokenFromDb->token) > 0 ) {
@@ -133,29 +135,34 @@ class TokenBasedAuth {
 		return false;
 	}
 
-	function setConnection(\PDO $conn) {
+	function setConnection(\PDO $conn)
+	{
 		$this->conn = $conn;
 
 		return $this;
 	}
 
-	function setHeader(Header $header) {
+	function setHeader(Header $header)
+	{
 		$this->header = $header;
 
 		return $this;
 	}
 
-	function setGenerator(TokenGenerator $generator) {
+	function setGenerator(TokenGenerator $generator)
+	{
 		$this->generator = $generator;
 
 		return $this;
 	}
 
-	function getUser() {
+	function getUser()
+	{
 		return $this->user;
 	}
 
-	function getGenerator() {
+	function getGenerator()
+	{
 		if ( is_null($this->generator) ) {
 			$this->generator = new Md5TokenGenerator($this->config['salt']);
 		}
@@ -163,7 +170,8 @@ class TokenBasedAuth {
 		return $this->generator;
 	}
 
-	function getHeader() {
+	function getHeader()
+	{
 		return $this->header;
 	}
 }
