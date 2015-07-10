@@ -6,7 +6,7 @@ class Header {
 
   private static $instance;
 
-  static function me() {
+  static public function me() {
     if ( is_null(self::$instance ) ) {
       self::$instance = new Header;
     }
@@ -14,11 +14,11 @@ class Header {
     return self::$instance;
   }
 
-  function getAllHeaders() {
+  public function getAllHeaders() {
     return getallheaders();
   }
 
-  function getAll() {
+  public function getAll() {
     if ( empty($this->headers) ) {
       $h = $this->getAllHeaders();
       foreach( $h as $key=>$value ) {
@@ -30,13 +30,13 @@ class Header {
     return $this->headers;
   }
 
-  function getClientToken() {
+  public function getClientToken() {
     $this->getAll();
 
     return $this->headers['ClientToken'];
   }
 
-  function getAppToken() {
+  public function getAppToken() {
     $this->getAll();
 
     return $this->headers['AppToken'];
