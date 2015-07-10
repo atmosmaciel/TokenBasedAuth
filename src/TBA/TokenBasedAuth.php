@@ -29,8 +29,8 @@ class TokenBasedAuth {
 		
 		$sql = sprintf(
 				'SELECT id, %s, token, tokenval FROM %s WHERE token = :token',
-				filter_var( $this->config['user_field'], FILTER_SANITIZE_STRING ),
-				filter_var( $this->config['table_name'], FILTER_SANITIZE_STRING )
+				filter_var($this->config['user_field'], FILTER_SANITIZE_STRING),
+				filter_var($this->config['table_name'], FILTER_SANITIZE_STRING)
 			);
 		$qry = $this->conn->prepare( $sql );
 		$qry->bindParam('token',$token);
@@ -48,9 +48,9 @@ class TokenBasedAuth {
 	{
 		$sql = sprintf(
 				'SELECT * FROM %s WHERE %s = :my_user AND %s = :my_pass;',
-				filter_var( $this->config['table_name'], FILTER_SANITIZE_STRING ),
-				filter_var( $this->config['user_field'], FILTER_SANITIZE_STRING ),
-				filter_var( $this->config['pass_field'], FILTER_SANITIZE_STRING )
+				filter_var($this->config['table_name'], FILTER_SANITIZE_STRING),
+				filter_var($this->config['user_field'], FILTER_SANITIZE_STRING),
+				filter_var($this->config['pass_field'], FILTER_SANITIZE_STRING)
 			);
 		$qry = $this->conn->prepare( $sql );
 
@@ -85,7 +85,7 @@ class TokenBasedAuth {
 
 		$sql = sprintf(
 				'UPDATE %s SET token = :token, tokenval = :tokenval WHERE id = :id',
-				filter_var( $this->config['table_name'], FILTER_SANITIZE_STRING )
+				filter_var($this->config['table_name'], FILTER_SANITIZE_STRING)
 			);
 		$qry = $this->conn->prepare( $sql );
 
@@ -100,7 +100,7 @@ class TokenBasedAuth {
 	{
 		$sql = sprintf(
 			'SELECT token, tokenval FROM %s WHERE token = :token',
-			filter_var( $this->config['table_name'], FILTER_SANITIZE_STRING )
+			filter_var($this->config['table_name'], FILTER_SANITIZE_STRING)
 		);
 
 		$qry = $this->conn->prepare( $sql );

@@ -2,8 +2,8 @@
 namespace Acoes;
 
 use \Respect\Rest\Routable;
-use \Auth\TokenBasedAuth,
-    \Auth\Header;
+use \Auth\TokenBasedAuth;
+use \Auth\Header;
 
 abstract class PrivateRoutable implements Routable {
   public function isAdmin() {

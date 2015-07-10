@@ -7,7 +7,7 @@ class Header {
   private static $instance;
 
   public static function me() {
-    if ( is_null(self::$instance ) ) {
+    if (is_null(self::$instance )) {
       self::$instance = new Header;
     }
 
@@ -19,11 +19,10 @@ class Header {
   }
 
   public function getAll() {
-    if ( empty($this->headers) ) {
+    if (empty($this->headers)) {
       $h = $this->getAllHeaders();
-      foreach( $h as $key=>$value ) {
+      foreach($h as $key=>$value) {
         $this->headers[ $key ] = $value;
-        //echo "{$key} = {$value}\n";
       }
     }
     
