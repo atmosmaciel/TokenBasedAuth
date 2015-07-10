@@ -131,8 +131,6 @@ class TokenBasedAuth {
 		} else {
 			throw new \TBA\Exceptions\InvalidTokenException("Credencial errada");
 		}
-
-		return false;
 	}
 
 	public function setConnection(\PDO $conn)
