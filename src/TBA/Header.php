@@ -6,7 +6,7 @@ class Header {
 
   private static $instance;
 
-  static public function me() {
+  public static function me() {
     if ( is_null(self::$instance ) ) {
       self::$instance = new Header;
     }
