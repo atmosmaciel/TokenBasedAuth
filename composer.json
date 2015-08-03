@@ -22,9 +22,7 @@
     "config": {
         "bin-dir": "bin"
     },
-    {
-        "suggest": {
-            "ramcoelho/silex-skeleton": "If you are using silex you should see this project"
-        }
+    "suggest": {
+        "ramcoelho/silex-skeleton": "If you are using silex you should see this project"
     }
 }
