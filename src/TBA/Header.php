@@ -6,37 +6,36 @@ class Header {
 
   private static $instance;
 
-  static function me() {
-    if ( is_null(self::$instance ) ) {
+  public static function me() {
+    if (is_null(self::$instance )) {
       self::$instance = new Header;
     }
 
     return self::$instance;
   }
 
-  function getAllHeaders() {
+  public function getAllHeaders() {
     return getallheaders();
   }
 
-  function getAll() {
-    if ( empty($this->headers) ) {
+  public function getAll() {
+    if (empty($this->headers)) {
       $h = $this->getAllHeaders();
-      foreach( $h as $key=>$value ) {
+      foreach($h as $key=>$value) {
         $this->headers[ $key ] = $value;
-        //echo "{$key} = {$value}\n";
       }
     }
     
     return $this->headers;
   }
 
-  function getClientToken() {
+  public function getClientToken() {
     $this->getAll();
 
     return $this->headers['ClientToken'];
   }
 
-  function getAppToken() {
+  public function getAppToken() {
     $this->getAll();
 
     return $this->headers['AppToken'];

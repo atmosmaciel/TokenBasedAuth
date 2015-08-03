@@ -16,21 +16,21 @@ class TokenBasedAuth {
 
 	private $config;
 
-	function __construct($config=null)
+	public function __construct($config=null)
 	{
 		$this->config = ( is_null($config) )
 			? self::$staticConfig
 			: $config;
 	}
 
-	function getUserByToken()
+	public function getUserByToken()
 	{
 		$token = $this->getHeader()->getClientToken();
 		
 		$sql = sprintf(
 				'SELECT id, %s, token, tokenval FROM %s WHERE token = :token',
-				filter_var( $this->config['user_field'], FILTER_SANITIZE_STRING ),
-				filter_var( $this->config['table_name'], FILTER_SANITIZE_STRING )
+				filter_var($this->config['user_field'], FILTER_SANITIZE_STRING),
+				filter_var($this->config['table_name'], FILTER_SANITIZE_STRING)
 			);
 		$qry = $this->conn->prepare( $sql );
 		$qry->bindParam('token',$token);
@@ -39,18 +39,18 @@ class TokenBasedAuth {
 		$this->user = $qry->fetchObject();
 	}
 
-	function getNewToken($value=null)
+	public function getNewToken($value=null)
 	{
 		return $this->getGenerator()->generate($value);
 	}
 
-	function login($user,$password)
+	public function login($user,$password)
 	{
 		$sql = sprintf(
 				'SELECT * FROM %s WHERE %s = :my_user AND %s = :my_pass;',
-				filter_var( $this->config['table_name'], FILTER_SANITIZE_STRING ),
-				filter_var( $this->config['user_field'], FILTER_SANITIZE_STRING ),
-				filter_var( $this->config['pass_field'], FILTER_SANITIZE_STRING )
+				filter_var($this->config['table_name'], FILTER_SANITIZE_STRING),
+				filter_var($this->config['user_field'], FILTER_SANITIZE_STRING),
+				filter_var($this->config['pass_field'], FILTER_SANITIZE_STRING)
 			);
 		$qry = $this->conn->prepare( $sql );
 
@@ -69,7 +69,7 @@ class TokenBasedAuth {
 		$this->changeToken();
 	}
 
-	function changeToken()
+	public function changeToken()
 	{
 		if ( is_null($this->user) ) {
 			$this->getUserByToken();
@@ -85,7 +85,7 @@ class TokenBasedAuth {
 
 		$sql = sprintf(
 				'UPDATE %s SET token = :token, tokenval = :tokenval WHERE id = :id',
-				filter_var( $this->config['table_name'], FILTER_SANITIZE_STRING )
+				filter_var($this->config['table_name'], FILTER_SANITIZE_STRING)
 			);
 		$qry = $this->conn->prepare( $sql );
 
@@ -96,11 +96,11 @@ class TokenBasedAuth {
 		$qry->execute();
 	}
 
-	function getToken($token)
+	public function getToken($token)
 	{
 		$sql = sprintf(
 			'SELECT token, tokenval FROM %s WHERE token = :token',
-			filter_var( $this->config['table_name'], FILTER_SANITIZE_STRING )
+			filter_var($this->config['table_name'], FILTER_SANITIZE_STRING)
 		);
 
 		$qry = $this->conn->prepare( $sql );
@@ -111,7 +111,7 @@ class TokenBasedAuth {
 		return $qry->fetchObject();
 	}
 
-	function check($token)
+	public function check($token)
 	{
 		$tokenFromDb = $this->getToken($token);
 
@@ -131,37 +131,35 @@ class TokenBasedAuth {
 		} else {
 			throw new \TBA\Exceptions\InvalidTokenException("Credencial errada");
 		}
-
-		return false;
 	}
 
-	function setConnection(\PDO $conn)
+	public function setConnection(\PDO $conn)
 	{
 		$this->conn = $conn;
 
 		return $this;
 	}
 
-	function setHeader(Header $header)
+	public function setHeader(Header $header)
 	{
 		$this->header = $header;
 
 		return $this;
 	}
 
-	function setGenerator(TokenGenerator $generator)
+	public function setGenerator(TokenGenerator $generator)
 	{
 		$this->generator = $generator;
 
 		return $this;
 	}
 
-	function getUser()
+	public function getUser()
 	{
 		return $this->user;
 	}
 
-	function getGenerator()
+	public function getGenerator()
 	{
 		if ( is_null($this->generator) ) {
 			$this->generator = new Md5TokenGenerator($this->config['salt']);
@@ -170,7 +168,7 @@ class TokenBasedAuth {
 		return $this->generator;
 	}
 
-	function getHeader()
+	public function getHeader()
 	{
 		return $this->header;
 	}
