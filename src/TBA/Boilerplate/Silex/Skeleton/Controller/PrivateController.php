@@ -1,5 +1,5 @@
 <?php
-namespace TBA\Siles\Skeleton\Controller;
+namespace TBA\Boilerplate\Silex\Skeleton\Controller;
 
 use Skel\Controller\Controller;
 
