@@ -1,11 +1,9 @@
 <?php
-namespace Acoes;
+namespace TBA\Siles\Skeleton\Controller;
 
-use \Respect\Rest\Routable;
-use \TBA\TokenBasedAuth;
-use \TBA\Header;
+use Skel\Controller\Controller;
 
-abstract class PrivateRoutable implements Routable {
+abstract class PrivateController extends Controller {
   public function isAdmin() {
     return true; //roadmap
   }
@@ -15,7 +13,7 @@ abstract class PrivateRoutable implements Routable {
   }
 
   public function checkAppAndClientToken() {
-    return ( $this->checkAppToken() && $this->checkClientToken() );
+    return ( $this->app['tba']->checkAppToken() && $this->app['tba']->checkClientToken() );
   }
 
   public function checkAppToken() {
@@ -28,14 +26,13 @@ abstract class PrivateRoutable implements Routable {
     $token = \TBA\Header::me()->getClientToken();
       //error_log("TOKEN: {$token}");
 
-    $a = new \TBA\TokenBasedAuth;
-      $a->setConnection( \Charon\Connection::me()->get() );
+    $this->app['tba']->setConnection( $this->app['db'] );
       
     try {
-      return $a->check($token);
+      return $this->app['tba']->check($token);
     } catch (\Exception $e) {
       if ( $e->getCode() == 401 ) {
-        $this->naoAutorizado( $e->getMessage() );
+        throw new \UnauthorizedException("Error Processing Request", 1);
       }
     }
   }
@@ -47,10 +44,5 @@ abstract class PrivateRoutable implements Routable {
   */
   public function validate() {
     return true;
-  }
-
-  public function naoAutorizado($msg="Não autorizado") {
-    http_response_code(401);
-    return ["msg"=>$msg];
   }
 }
