@@ -26,7 +26,7 @@ CREATE TABLE {$db['table']} (
 
 $sql_pgsql = "
 CREATE TABLE {$db['table']} (
-	id integer not null auto_increment primary key,
+	id serial primary key,
 	username varchar(40) not null,
 	passwd varchar(40) not null,
 	token varchar(40),
