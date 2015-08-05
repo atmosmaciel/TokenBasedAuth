@@ -2,8 +2,14 @@
 namespace TBA\Boilerplate\Silex\Skeleton\Controller;
 
 use Skel\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 abstract class PrivateController extends Controller {
+  public function optionsRequest()
+  {
+    return new JsonResponse(array('msg'=>'ok'),200);
+  }
+
   public function isAdmin() {
     return true; //roadmap
   }
@@ -13,7 +19,7 @@ abstract class PrivateController extends Controller {
   }
 
   public function checkAppAndClientToken() {
-    return ( $this->app['tba']->checkAppToken() && $this->app['tba']->checkClientToken() );
+    return ( $this->checkAppToken() && $this->checkClientToken() );
   }
 
   public function checkAppToken() {
@@ -31,9 +37,7 @@ abstract class PrivateController extends Controller {
     try {
       return $this->app['tba']->check($token);
     } catch (\Exception $e) {
-      if ( $e->getCode() == 401 ) {
         throw new \UnauthorizedException("Error Processing Request", 1);
-      }
     }
   }
 
