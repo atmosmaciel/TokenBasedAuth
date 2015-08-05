@@ -77,6 +77,8 @@ class TokenBasedAuth {
 
 		$this->getUser()->token = $this->getNewToken();
 
+		//error_log("Novo token: {$this->user->token}");
+
 		$time = sprintf(
 			'now +%d minutes',
 			$this->config['token_timeout']
@@ -115,7 +117,7 @@ class TokenBasedAuth {
 	{
 		$tokenFromDb = $this->getToken($token);
 
-		if ( isset($tokenFromDb->token) > 0 ) {
+		if ( isset($tokenFromDb->token) ) {
 			$tval = new \Datetime($tokenFromDb->tokenval);
 			$diff = ( new \Datetime )->diff( $tval );
 
