@@ -19,6 +19,7 @@ class TBAProvider implements ServiceProviderInterface
             $config['salt'] = $app['tba.salt'];
 
             $tba = new TokenBasedAuth( $config );
+            $tba->setHeader( new \TBA\Header );
 
             return $tba;
         });
