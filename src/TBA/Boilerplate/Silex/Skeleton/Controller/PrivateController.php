@@ -38,7 +38,7 @@ abstract class PrivateController extends Controller {
     try {
       return $this->app['tba']->check($token);
     } catch (\Exception $e) {
-        throw new UnauthorizedException("Error Processing Request", 1);
+        throw new UnauthorizedException("Você não tem autorização de acesso.", 1);
     }
   }
 
