@@ -2,6 +2,7 @@
 namespace TBA\Boilerplate\Silex\Skeleton\Controller;
 
 use Skel\Controller\Controller;
+use TBA\Exceptions\UnauthorizedException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 abstract class PrivateController extends Controller {
@@ -37,7 +38,7 @@ abstract class PrivateController extends Controller {
     try {
       return $this->app['tba']->check($token);
     } catch (\Exception $e) {
-        throw new \UnauthorizedException("Error Processing Request", 1);
+        throw new UnauthorizedException("Error Processing Request", 1);
     }
   }
 
