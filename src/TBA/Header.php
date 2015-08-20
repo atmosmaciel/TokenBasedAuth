@@ -1,6 +1,8 @@
 <?php
 namespace TBA;
 
+use \TBA\Exceptions\UnauthorizedException;
+
 class Header {
   private $headers;
 
