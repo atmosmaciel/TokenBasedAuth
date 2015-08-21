@@ -6,7 +6,8 @@ create table user (
 	username varchar(50) not null,
 	password varchar(40) not null,
 	token varchar(255),
-	tokenval datetime
+	tokenval datetime,
+	last_login datetime
 );
 
 insert into user(id,name,username,password,token,tokenval)

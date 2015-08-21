@@ -20,7 +20,8 @@ CREATE TABLE {$db['table']} (
 	username varchar(40) not null,
 	passwd varchar(40) not null,
 	token varchar(40),
-	tokenval datetime
+	tokenval datetime,
+	last_login datetime
 );
 ";
 
@@ -30,7 +31,8 @@ CREATE TABLE {$db['table']} (
 	username varchar(40) not null,
 	passwd varchar(40) not null,
 	token varchar(40),
-	tokenval datetime
+	tokenval datetime,
+	last_login datetime
 );
 ";
 

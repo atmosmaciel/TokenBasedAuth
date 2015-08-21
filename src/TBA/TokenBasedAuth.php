@@ -66,6 +66,17 @@ class TokenBasedAuth {
 			
 		unset( $this->user->{$this->config["pass_field"]} );
 
+		$sql = sprintf(
+				'UPDATE %s SET last_login = :login_date WHERE :user_id;',
+				filter_var($this->config['table_name'], FILTER_SANITIZE_STRING)
+			);
+		$qry = $this->conn->prepare( $sql );
+
+		$data_hora = ( new \Datetime )->format("Y-m-d H:i:s");
+		$qry->bindParam(':login_date', $data_hora );
+		$qry->bindParam('user_id',$this->user->id);
+		$qry->execute();
+
 		$this->changeToken();
 	}
 
