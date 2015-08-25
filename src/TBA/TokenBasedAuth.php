@@ -185,4 +185,9 @@ class TokenBasedAuth {
 	{
 		return $this->header;
 	}
+
+	public function getConfig()
+	{
+		return $this->config;
+	}
 }
