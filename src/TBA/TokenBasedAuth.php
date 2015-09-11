@@ -28,7 +28,8 @@ class TokenBasedAuth {
 		$token = $this->getHeader()->getClientToken();
 		
 		$sql = sprintf(
-				'SELECT id, %s, token, tokenval FROM %s WHERE token = :token',
+				//'SELECT id, %s, token, tokenval FROM %s WHERE token = :token',
+				'SELECT * FROM %s WHERE token = :token',
 				filter_var($this->config['user_field'], FILTER_SANITIZE_STRING),
 				filter_var($this->config['table_name'], FILTER_SANITIZE_STRING)
 			);
@@ -37,6 +38,7 @@ class TokenBasedAuth {
 		$qry->execute();
 
 		$this->user = $qry->fetchObject();
+		unset($this->user->{$this->config['pass_field']});
 	}
 
 	public function getNewToken($value=null)
