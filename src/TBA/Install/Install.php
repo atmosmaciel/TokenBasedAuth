@@ -18,8 +18,8 @@ $sql_mysql = "
 CREATE TABLE {$db['table']} (
 	id integer not null auto_increment primary key,
 	username varchar(40) not null,
-	passwd varchar(40) not null,
-	token varchar(40),
+	passwd varchar(128) not null,
+	token varchar(128),
 	tokenval datetime,
 	last_login datetime
 );
@@ -29,8 +29,8 @@ $sql_pgsql = "
 CREATE TABLE {$db['table']} (
 	id serial primary key,
 	username varchar(40) not null,
-	passwd varchar(40) not null,
-	token varchar(40),
+	passwd varchar(128) not null,
+	token varchar(128),
 	tokenval datetime,
 	last_login datetime
 );
