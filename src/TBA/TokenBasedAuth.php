@@ -28,8 +28,7 @@ class TokenBasedAuth {
 		$token = $this->getHeader()->getClientToken();
 		
 		$sql = sprintf(
-				'SELECT id, %s, token, tokenval FROM %s WHERE token = :token',
-				filter_var($this->config['user_field'], FILTER_SANITIZE_STRING),
+				'SELECT * FROM %s WHERE token = :token',
 				filter_var($this->config['table_name'], FILTER_SANITIZE_STRING)
 			);
 		$qry = $this->conn->prepare( $sql );
@@ -37,6 +36,7 @@ class TokenBasedAuth {
 		$qry->execute();
 
 		$this->user = $qry->fetchObject();
+		unset($this->user->{$this->config['pass_field']});
 	}
 
 	public function getNewToken($value=null)
@@ -65,6 +65,17 @@ class TokenBasedAuth {
 		}
 			
 		unset( $this->user->{$this->config["pass_field"]} );
+
+		$sql = sprintf(
+				'UPDATE %s SET last_login = :login_date WHERE :user_id;',
+				filter_var($this->config['table_name'], FILTER_SANITIZE_STRING)
+			);
+		$qry = $this->conn->prepare( $sql );
+
+		$data_hora = ( new \Datetime )->format("Y-m-d H:i:s");
+		$qry->bindParam(':login_date', $data_hora );
+		$qry->bindParam('user_id',$this->user->id);
+		$qry->execute();
 
 		$this->changeToken();
 	}
@@ -173,5 +184,10 @@ class TokenBasedAuth {
 	public function getHeader()
 	{
 		return $this->header;
+	}
+
+	public function getConfig()
+	{
+		return $this->config;
 	}
 }

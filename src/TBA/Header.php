@@ -1,6 +1,8 @@
 <?php
 namespace TBA;
 
+use \TBA\Exceptions\UnauthorizedException;
+
 class Header {
   private $headers;
 
@@ -37,6 +39,10 @@ class Header {
 
   public function getAppToken() {
     $this->getAll();
+
+    if ( !isset($this->headers['AppToken']) ) {
+      throw new UnauthorizedException("Application token not known", 1);
+    }
 
     return $this->headers['AppToken'];
   }
