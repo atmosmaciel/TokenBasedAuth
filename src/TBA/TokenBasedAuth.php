@@ -1,193 +1,206 @@
 <?php
 namespace TBA;
 
-use \TBA\Generators\TokenGenerator,
-	\TBA\Generators\Md5TokenGenerator,
-	\TBA\Header;
+use \TBA\Exceptions\InvalidTokenException;
+use \TBA\Generators\Md5TokenGenerator;
+use \TBA\Generators\TokenGenerator;
+use \TBA\Header;
 
-class TokenBasedAuth {
-	static private $staticConfig;
+class TokenBasedAuth
+{
+    private static $staticConfig;
 
-	private $user;
+    private $user;
 
-	private $generator;
-	private $conn;
-	private $header;
+    private $generator;
+    private $conn;
+    private $header;
 
-	private $config;
+    private $config;
 
-	public function __construct($config=null)
-	{
-		$this->config = ( is_null($config) )
-			? self::$staticConfig
-			: $config;
-	}
+    public function __construct($config = null)
+    {
+        $this->config = (is_null($config))
+        ? self::$staticConfig
+        : $config;
+    }
 
-	public function getUserByToken()
-	{
-		$token = $this->getHeader()->getClientToken();
-		
-		$sql = sprintf(
-				'SELECT * FROM %s WHERE token = :token',
-				filter_var($this->config['table_name'], FILTER_SANITIZE_STRING)
-			);
-		$qry = $this->conn->prepare( $sql );
-		$qry->bindParam('token',$token);
-		$qry->execute();
+    public function getUserByToken()
+    {
+        $token = $this->getHeader()->getClientToken();
 
-		$this->user = $qry->fetchObject();
-		unset($this->user->{$this->config['pass_field']});
-	}
+        $sql = sprintf(
+            'SELECT * FROM %s WHERE token = :token',
+            filter_var($this->config['table_name'], FILTER_SANITIZE_STRING)
+        );
+        $qry = $this->conn->prepare($sql);
+        $qry->bindParam('token', $token);
+        $qry->execute();
 
-	public function getNewToken($value=null)
-	{
-		return $this->getGenerator()->generate($value);
-	}
+        if ($qry->rowCount() == 0) {
+            throw new InvalidTokenException("Token inválido");
+        }
 
-	public function login($user,$password)
-	{
-		$sql = sprintf(
-				'SELECT * FROM %s WHERE %s = :my_user AND %s = :my_pass;',
-				filter_var($this->config['table_name'], FILTER_SANITIZE_STRING),
-				filter_var($this->config['user_field'], FILTER_SANITIZE_STRING),
-				filter_var($this->config['pass_field'], FILTER_SANITIZE_STRING)
-			);
-		$qry = $this->conn->prepare( $sql );
+        $this->user = $qry->fetchObject();
 
-		$qry->bindParam('my_user',$user);
-		$qry->bindParam('my_pass',$password);
-		$qry->execute();
+        unset($this->user->{$this->config['pass_field']});
 
-		$this->user = $qry->fetchObject();
-		
-		if ( !isset($this->user->id) || (int)$this->user->id == 0 ) {
-			throw new \TBA\Exceptions\InvalidLoginException("Combinação de login e senha inválida");
-		}
-			
-		unset( $this->user->{$this->config["pass_field"]} );
+        return $this->user;
+    }
 
-		$sql = sprintf(
-				'UPDATE %s SET last_login = :login_date WHERE :user_id;',
-				filter_var($this->config['table_name'], FILTER_SANITIZE_STRING)
-			);
-		$qry = $this->conn->prepare( $sql );
+    public function getNewToken($value = null)
+    {
+        return $this->getGenerator()->generate($value);
+    }
 
-		$data_hora = ( new \Datetime )->format("Y-m-d H:i:s");
-		$qry->bindParam(':login_date', $data_hora );
-		$qry->bindParam('user_id',$this->user->id);
-		$qry->execute();
+    public function login($user, $password)
+    {
+        $sql = sprintf(
+            'SELECT * FROM %s WHERE %s = :my_user AND %s = :my_pass;',
+            filter_var($this->config['table_name'], FILTER_SANITIZE_STRING),
+            filter_var($this->config['user_field'], FILTER_SANITIZE_STRING),
+            filter_var($this->config['pass_field'], FILTER_SANITIZE_STRING)
+        );
+        $qry = $this->conn->prepare($sql);
 
-		$this->changeToken();
-	}
+        $qry->bindParam('my_user', $user);
+        $qry->bindParam('my_pass', $password);
+        $qry->execute();
 
-	public function changeToken()
-	{
-		if ( is_null($this->user) ) {
-			$this->getUserByToken();
-		}
+        $this->user = $qry->fetchObject();
 
-		$this->getUser()->token = $this->getNewToken();
+        if (!isset($this->user->id) || (int) $this->user->id == 0) {
+            throw new \TBA\Exceptions\InvalidLoginException("Combinação de login e senha inválida");
+        }
 
-		//error_log("Novo token: {$this->user->token}");
+        unset($this->user->{$this->config["pass_field"]});
 
-		$time = sprintf(
-			'now +%d minutes',
-			$this->config['token_timeout']
-		);
-		$this->getUser()->tokenval = new \Datetime($time);
+        $sql = sprintf(
+            'UPDATE %s SET last_login = :login_date WHERE :user_id;',
+            filter_var($this->config['table_name'], FILTER_SANITIZE_STRING)
+        );
+        $qry = $this->conn->prepare($sql);
 
-		$sql = sprintf(
-				'UPDATE %s SET token = :token, tokenval = :tokenval WHERE id = :id',
-				filter_var($this->config['table_name'], FILTER_SANITIZE_STRING)
-			);
-		$qry = $this->conn->prepare( $sql );
+        $data_hora = (new \Datetime)->format("Y-m-d H:i:s");
+        $qry->bindParam(':login_date', $data_hora);
+        $qry->bindParam('user_id', $this->user->id);
+        $qry->execute();
 
-		$val = $this->getUser()->tokenval->format("Y-m-d H:i:s");
-		$qry->bindParam('token',$this->getUser()->token);
-		$qry->bindParam('tokenval',$val);
-		$qry->bindParam('id',$this->getUser()->id);
-		$qry->execute();
-	}
+        $this->changeToken();
 
-	public function getToken($token)
-	{
-		$sql = sprintf(
-			'SELECT token, tokenval FROM %s WHERE token = :token',
-			filter_var($this->config['table_name'], FILTER_SANITIZE_STRING)
-		);
+        return true;
+    }
 
-		$qry = $this->conn->prepare( $sql );
+    public function changeToken()
+    {
+        if (is_null($this->user)) {
+            $this->getUserByToken();
+        }
 
-		$qry->bindParam('token',$token);
-		$qry->execute();
+        $this->getUser()->token = $this->getNewToken();
 
-		return $qry->fetchObject();
-	}
+        $time = sprintf(
+            'now +%d minutes',
+            $this->config['token_timeout']
+        );
+        $this->getUser()->tokenval = new \Datetime($time);
 
-	public function check($token)
-	{
-		$tokenFromDb = $this->getToken($token);
+        $sql = sprintf(
+            'UPDATE %s SET token = :token, tokenval = :tokenval WHERE id = :id',
+            filter_var($this->config['table_name'], FILTER_SANITIZE_STRING)
+        );
+        $qry = $this->conn->prepare($sql);
 
-		if ( isset($tokenFromDb->token) ) {
-			$tval = new \Datetime($tokenFromDb->tokenval);
-			$diff = ( new \Datetime )->diff( $tval );
+        $val = $this->getUser()->tokenval->format("Y-m-d H:i:s");
+        $qry->bindParam('token', $this->getUser()->token);
+        $qry->bindParam('tokenval', $val);
+        $qry->bindParam('id', $this->getUser()->id);
+        $qry->execute();
+    }
 
-			if ( $diff->i == 1 || $diff->i == 2 ) {
-				$this->changeToken();
-			} else
+    public function getToken($token)
+    {
+        $sql = sprintf(
+            'SELECT token, tokenval FROM %s WHERE token = :token',
+            filter_var($this->config['table_name'], FILTER_SANITIZE_STRING)
+        );
 
-			if ( $tval < new \Datetime ) {
-				throw new \TBA\Exceptions\InvalidTokenException("Token expirado",401);
-			} 
+        $qry = $this->conn->prepare($sql);
 
-			return true;
-		} else {
-			throw new \TBA\Exceptions\InvalidTokenException("Credencial errada");
-		}
-	}
+        $qry->bindParam('token', $token);
+        $qry->execute();
 
-	public function setConnection(\PDO $conn)
-	{
-		$this->conn = $conn;
+        return $qry->fetchObject();
+    }
 
-		return $this;
-	}
+    public function check($token)
+    {
+        $tokenFromDb = $this->getToken($token);
 
-	public function setHeader(Header $header)
-	{
-		$this->header = $header;
+        if (isset($tokenFromDb->token)) {
+            $tval = new \Datetime($tokenFromDb->tokenval);
+            $diff = (new \Datetime)->diff($tval);
 
-		return $this;
-	}
+            if ($diff->i == 1 || $diff->i == 2) {
+                $this->changeToken();
+            } else
 
-	public function setGenerator(TokenGenerator $generator)
-	{
-		$this->generator = $generator;
+            if ($tval < new \Datetime) {
+                throw new \TBA\Exceptions\InvalidTokenException("Token expirado", 401);
+            }
 
-		return $this;
-	}
+            return true;
+        } else {
+            throw new \TBA\Exceptions\InvalidTokenException("Credencial errada");
+        }
+    }
 
-	public function getUser()
-	{
-		return $this->user;
-	}
+    public function setConnection(\PDO $conn)
+    {
+        $this->conn = $conn;
 
-	public function getGenerator()
-	{
-		if ( is_null($this->generator) ) {
-			$this->generator = new Md5TokenGenerator($this->config['salt']);
-		}
+        return $this;
+    }
 
-		return $this->generator;
-	}
+    public function setHeader(Header $header)
+    {
+        $this->header = $header;
 
-	public function getHeader()
-	{
-		return $this->header;
-	}
+        return $this;
+    }
 
-	public function getConfig()
-	{
-		return $this->config;
-	}
+    public function setGenerator(TokenGenerator $generator)
+    {
+        $this->generator = $generator;
+
+        return $this;
+    }
+
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    public function getGenerator()
+    {
+        if (is_null($this->generator)) {
+            $this->generator = new Md5TokenGenerator($this->config['salt']);
+        }
+
+        return $this->generator;
+    }
+
+    public function getHeader()
+    {
+        if (is_null($this->header)) {
+            $this->header = new \TBA\Header;
+        }
+
+        return $this->header;
+    }
+
+    public function getConfig()
+    {
+        return $this->config;
+    }
 }
