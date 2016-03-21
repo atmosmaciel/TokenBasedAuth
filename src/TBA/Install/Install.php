@@ -1,17 +1,17 @@
 <?php
 $db = array(
-	'scheme' => 'mysql',
-	'user' => 'root',
-	'pass' => 'root123',
-	'host' => 'localhost',
-	'db' => 'charon',
-	'table' => 'tba_user'
+    'scheme' => 'mysql',
+    'user' => 'root',
+    'pass' => 'root123',
+    'host' => 'localhost',
+    'db' => 'charon',
+    'table' => 'tba_user',
 );
 
 $conn = new \PDO(
-	"{$db['scheme']}:host={$db['host']};dbname={$db['db']}",
-	$db['user'],
-	$db['pass']
+    "{$db['scheme']}:host={$db['host']};dbname={$db['db']}",
+    $db['user'],
+    $db['pass']
 );
 
 $sql_mysql = "
@@ -36,15 +36,15 @@ CREATE TABLE {$db['table']} (
 );
 ";
 
-switch ( $db['scheme'] ) {
-	case 'pgsql':
-		$install_table = $sql_pgsql;
-		break;
-	
-	case 'mysql':
-	default:
-		$install_table = $sql_mysql;
-		break;
+switch ($db['scheme']) {
+    case 'pgsql':
+        $install_table = $sql_pgsql;
+        break;
+
+    case 'mysql':
+    default:
+        $install_table = $sql_mysql;
+        break;
 }
 
-$conn->exec( $install_table );
+$conn->exec($install_table);
