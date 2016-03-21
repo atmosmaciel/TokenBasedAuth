@@ -4,7 +4,7 @@ $db = array(
     'user' => 'root',
     'pass' => 'root123',
     'host' => 'localhost',
-    'db' => 'charon',
+    'db' => 'tba',
     'table' => 'tba_user',
 );
 
@@ -48,3 +48,30 @@ switch ($db['scheme']) {
 }
 
 $conn->exec($install_table);
+
+define("APP_ROOT", dirname(__DIR__));
+
+require APP_ROOT . "/TokenBasedAuth.php";
+require APP_ROOT . "/Header.php";
+
+$app = array();
+$app['tba.table_name'] = 'tba_user';
+$app['tba.user_field'] = 'username';
+$app['tba.pass_field'] = 'passwd';
+$app['tba.token_timeout'] = '60';
+$app['tba.salt'] = 'M3T45_901X';
+
+$tba = new TBA\TokenBasedAuth($app);
+$tba->setConnection($conn);
+
+$sql_user = "INSERT INTO tba_user (username,passwd) values (:user,:pwd);";
+$user = 'evaldobarbosa@gmail.com';
+$passwd = 'evaldo123';
+
+$pwdHash = md5($app['tba.salt'] . "{$passwd}123X");
+
+$rs = $conn->prepare($sql_user);
+$rs->bindParam("user", $user);
+$rs->bindParam("pwd", $pwdHash);
+
+$rs->execute();
