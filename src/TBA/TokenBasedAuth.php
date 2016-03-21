@@ -1,7 +1,10 @@
 <?php
 namespace TBA;
 
+<<<<<<< HEAD
+=======
 use \TBA\Exceptions\InvalidTokenException;
+>>>>>>> 5867a1940ecacb13cf938c5ddca9b23d680cf27c
 use \TBA\Generators\Md5TokenGenerator;
 use \TBA\Generators\TokenGenerator;
 use \TBA\Header;
@@ -30,13 +33,21 @@ class TokenBasedAuth
         $token = $this->getHeader()->getClientToken();
 
         $sql = sprintf(
+<<<<<<< HEAD
+            'SELECT * FROM %s tba WHERE token = :token',
+=======
             'SELECT * FROM %s WHERE token = :token',
+>>>>>>> 5867a1940ecacb13cf938c5ddca9b23d680cf27c
             filter_var($this->config['table_name'], FILTER_SANITIZE_STRING)
         );
         $qry = $this->conn->prepare($sql);
         $qry->bindParam('token', $token);
         $qry->execute();
 
+<<<<<<< HEAD
+        $this->user = $qry->fetchObject();
+        unset($this->user->{$this->config['pass_field']});
+=======
         if ($qry->rowCount() == 0) {
             throw new InvalidTokenException("Token inválido");
         }
@@ -46,6 +57,7 @@ class TokenBasedAuth
         unset($this->user->{$this->config['pass_field']});
 
         return $this->user;
+>>>>>>> 5867a1940ecacb13cf938c5ddca9b23d680cf27c
     }
 
     public function getNewToken($value = null)
@@ -56,7 +68,11 @@ class TokenBasedAuth
     public function login($user, $password)
     {
         $sql = sprintf(
+<<<<<<< HEAD
+            'SELECT * FROM %s tba WHERE %s = :my_user AND %s = :my_pass;',
+=======
             'SELECT * FROM %s WHERE %s = :my_user AND %s = :my_pass;',
+>>>>>>> 5867a1940ecacb13cf938c5ddca9b23d680cf27c
             filter_var($this->config['table_name'], FILTER_SANITIZE_STRING),
             filter_var($this->config['user_field'], FILTER_SANITIZE_STRING),
             filter_var($this->config['pass_field'], FILTER_SANITIZE_STRING)
@@ -87,8 +103,11 @@ class TokenBasedAuth
         $qry->execute();
 
         $this->changeToken();
+<<<<<<< HEAD
+=======
 
         return true;
+>>>>>>> 5867a1940ecacb13cf938c5ddca9b23d680cf27c
     }
 
     public function changeToken()
@@ -99,6 +118,11 @@ class TokenBasedAuth
 
         $this->getUser()->token = $this->getNewToken();
 
+<<<<<<< HEAD
+        //error_log("Novo token: {$this->user->token}");
+
+=======
+>>>>>>> 5867a1940ecacb13cf938c5ddca9b23d680cf27c
         $time = sprintf(
             'now +%d minutes',
             $this->config['token_timeout']
@@ -121,7 +145,11 @@ class TokenBasedAuth
     public function getToken($token)
     {
         $sql = sprintf(
+<<<<<<< HEAD
+            'SELECT token, tokenval FROM %s tba WHERE token = :token',
+=======
             'SELECT token, tokenval FROM %s WHERE token = :token',
+>>>>>>> 5867a1940ecacb13cf938c5ddca9b23d680cf27c
             filter_var($this->config['table_name'], FILTER_SANITIZE_STRING)
         );
 
@@ -192,10 +220,13 @@ class TokenBasedAuth
 
     public function getHeader()
     {
+<<<<<<< HEAD
+=======
         if (is_null($this->header)) {
             $this->header = new \TBA\Header;
         }
 
+>>>>>>> 5867a1940ecacb13cf938c5ddca9b23d680cf27c
         return $this->header;
     }
 
