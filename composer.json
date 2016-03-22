@@ -1,7 +1,6 @@
 {
     "name": "evaldobarbosa/tokenbasedauth",
     "description": "Biblioteca de autenticação por tokens",
-    "version": "0.1.0",
     "type": "library",
     "homepage": "http://www.evaldobarbosa.com.br/projetos/tokenbasedauth",
     "license": "LGPL-3.0",
