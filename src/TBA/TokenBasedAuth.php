@@ -142,7 +142,6 @@ class TokenBasedAuth
             $diff = (new \Datetime)->diff($tval);
 
             if ($diff->i == 1 || $diff->i == 2) {
-                echo "token\n";
                 $this->changeToken();
             } else
 

@@ -27,11 +27,15 @@ class AuthTest extends \PHPUnit_Framework_TestCase
 
         $pdo = new PDO('sqlite::memory:');
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $pdo->exec(file_get_contents(__DIR__ . '/table.sql'));
+        try {
+            $pdo->exec(file_get_contents(__DIR__ . '/table.sql'));
 
-        $this->conn = $pdo;
+            $this->conn = $pdo;
 
-        $this->auth->setConnection($this->conn);
+            $this->auth->setConnection($this->conn);
+        } catch (\Exception $e) {
+            error_log("erro na conexão com o sqlite: {$e->getMessage()}");
+        }
     }
 
     public function getMockedTBAObject($methods)
