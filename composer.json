@@ -21,6 +21,7 @@
     "config": {
         "bin-dir": "bin"
     },
+    "minimum-stability" : "dev",
     "suggest": {
         "ramcoelho/silex-skeleton": "If you are using silex you should see this project"
     }
