@@ -21,7 +21,11 @@
     "config": {
         "bin-dir": "bin"
     },
-    "minimum-stability" : "dev",
+    "extra": {
+        "branch-alias": {
+            "v1.0.0": "@stable"
+        }
+    },
     "suggest": {
         "ramcoelho/silex-skeleton": "If you are using silex you should see this project"
     }
